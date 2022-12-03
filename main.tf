@@ -79,6 +79,7 @@ resource "aws_lightsail_instance" "app" {
       "sudo rsync -vr ${var.target_path_root}/workspace/projects/keyin/composeit /etc/keyin/ > /dev/null",
       "sleep 5",
       "sudo usermod -aG docker ${var.target_user_name}",
+      "echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf; echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf; sysctl -p",
       "cat ~/docker_passwd.txt | sudo docker login --username winsonsun --password-stdin ; sudo docker pull winsonsun/sstool:0.2; sudo docker pull winsonsun/kktool:0.2",
       "sudo ${var.target_path_root}/workspace/projects/keyin/common/change-local-ip.sh /etc/keyin/conf/network/kcp-server.json",
       "sudo cp ${var.target_path_root}/workspace/projects/keyin/common/docker-compose-sk.service /etc/systemd/system/; sudo systemctl daemon-reload",
