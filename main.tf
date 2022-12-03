@@ -68,13 +68,13 @@ resource "aws_lightsail_instance" "app" {
 
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p ${var.target_path_root}/workspace/projects",
+      "mkdir -p ${var.target_path_root}/workspace/projects; mkdir -p ${var.target_path_root}/workspace/tools",
       "mkdir -p /etc/keyin",
       "sudo chmod 600 .ssh/vm_rsa",
       "ssh-keygen -F github.com || ssh-keyscan github.com >> ${var.target_path_root}/.ssh/known_hosts",
-      "ssh-agent bash -c 'ssh-add ${var.target_path_root}/.ssh/vm_rsa; cd ${var.target_path_root}/workspace/projects; git clone git@github.com:winsonsun/keyin.git'; cd ~",
+      "ssh-agent bash -c 'ssh-add ${var.target_path_root}/.ssh/vm_rsa; cd ${var.target_path_root}/workspace/projects; git clone git@github.com:winsonsun/keyin.git'",
       #"ssh-agent bash -c 'ssh-add ~/.ssh/vm_rsa; git push origin master'",
-      "cd ${var.target_path_root}/workspace/projects/keyin; git checkout master; sudo ./common/init-vm.sh; cd ~",
+      "cd ${var.target_path_root}/workspace/projects/keyin; git checkout master; sudo ${var.target_path_root}/workspace/projects/keyin/common/init-vm.sh N US ubuntu; cd ~",
       "sudo rsync -vr ${var.target_path_root}/workspace/projects/keyin/conf /etc/keyin/ > /dev/null;",
       "sudo rsync -vr ${var.target_path_root}/workspace/projects/keyin/composeit /etc/keyin/ > /dev/null",
       "sleep 5",
