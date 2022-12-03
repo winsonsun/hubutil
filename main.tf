@@ -79,7 +79,7 @@ resource "aws_lightsail_instance" "app" {
       "sudo rsync -vr ${var.target_path_root}/workspace/projects/keyin/composeit /etc/keyin/ > /dev/null",
       "sleep 5",
       "sudo usermod -aG docker ${var.target_user_name}",
-      "cat ~/docker_passwd.txt | sudo docker login --username winsonsun --password-stdin ; sudo docker pull winsonsun/sstool:0.1; sudo docker pull winsonsun/kktool:0.1",
+      "cat ~/docker_passwd.txt | sudo docker login --username winsonsun --password-stdin ; sudo docker pull winsonsun/sstool:0.2; sudo docker pull winsonsun/kktool:0.2",
       "sudo ${var.target_path_root}/workspace/projects/keyin/common/change-local-ip.sh /etc/keyin/conf/network/kcp-server.json",
       "sudo cp ${var.target_path_root}/workspace/projects/keyin/common/docker-compose-sk.service /etc/systemd/system/; sudo systemctl daemon-reload",
       "sudo systemctl enable docker-compose-sk.service; sudo systemctl start docker-compose-sk.service"
@@ -122,17 +122,17 @@ resource "aws_lightsail_instance_public_ports" "app" {
     to_port   = 10213
   }
 
-  port_info {
-    protocol = "udp"
-    from_port = 18513
-    to_port = 18613
-  }
+  #port_info {
+  #  protocol = "udp"
+  #  from_port = 18513
+  #  to_port = 18613
+  #}
   
-  port_info {
-    protocol = "tcp"
-    from_port = 18513
-    to_port = 18613
-  }
+  #port_info {
+  #  protocol = "tcp"
+  #  from_port = 18513
+  #  to_port = 18613
+  #}
 }
 
 output "instance_lan_addr" {
