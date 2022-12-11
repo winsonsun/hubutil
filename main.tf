@@ -25,21 +25,48 @@ variable "hub_instance_name" {
   description = "The name of VM/lightsail, used to differtiate from instances"
 }
 
-variable "sk_availability_zone" {
+variable "sk_region" {
   type = string
-  default = "us-east-2a"
+  default = "us-east-2"
   description = "target AZ name"
 } 
 
+variable "pk_collection" {
+    type = map(string)
+    default = {
+    "us-east-2" = "LightsailDefaultKey-us-east-2.pem"
+    "ap-northeast-1" = "LightsailDefaultKey-ap-northeast-1.pem"
+    }
+}
+
+variable "az_collection" {
+    type = map(string)
+    default = {
+    "us-east-2" = "us-east-2a"
+    "ap-northeast-1" = "ap-northeast-1a"
+    }
+}
+
+locals {
+  sk_availability_zone = lookup(var.az_collection, var.sk_region, "NA.")
+  pk_this = lookup(var.pk_collection, var.sk_region, "NA.")  
+}
+
+locals {
+  full_pk_this = "~/workspace/keys/aws/${local.pk_this}"
+} 
+
+
 provider "aws" {
-  region = "us-east-2"
+  region = var.sk_region
 }
 
 resource "aws_lightsail_instance" "app" {
   #name              = "skshell"
   name 			= var.hub_instance_name
   #availability_zone = "us-east-2a"
-  availability_zone  = var.sk_availability_zone
+  availability_zone  = local.sk_availability_zone
+  #availability_zone  = "ap-northeast-1"
   blueprint_id       = "ubuntu_20_04"
   bundle_id          = "nano_2_0"
 
@@ -47,7 +74,7 @@ resource "aws_lightsail_instance" "app" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = "${file("~/workspace/keys/aws/LightsailDefaultKey-us-east-2.pem")}"
+    private_key = "${file(local.full_pk_this)}"
     host        = "${self.public_ip_address}"
   }
   
