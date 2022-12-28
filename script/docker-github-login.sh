@@ -1,6 +1,10 @@
 #!/bin/bash
+#
+# NOTE: This script is mainly used in hubutil with main.tf tool. Don't try to use it directly
+# (there are similiar function script can do the same work
+#
 
-set -x
+#set -x
 working_root="$1"
 working_user_name="$2"
 
@@ -22,4 +26,4 @@ sudo ${working_root}/workspace/projects/keyin/common/change-local-ip.sh /etc/key
 sudo cp ${working_root}/workspace/projects/keyin/common/docker-compose-sk.service /etc/systemd/system/; sudo systemctl daemon-reload
 sudo systemctl enable docker-compose-sk.service; sudo systemctl start docker-compose-sk.service
 
-set +x
+#set +x
