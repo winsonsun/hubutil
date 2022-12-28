@@ -92,26 +92,16 @@ resource "aws_lightsail_instance" "app" {
     source	= "conf/keys/docker_passwd.txt"
     destination = "${var.target_path_root}/docker_passwd.txt"
   }
+  
+  provisioner "file" {
+    source	= "script/docker-github-login.sh"
+    destination = "${var.target_path_root}/docker-github-login.sh"
+  }
 
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p ${var.target_path_root}/workspace/projects; mkdir -p ${var.target_path_root}/workspace/tools",
-      "mkdir -p /etc/keyin",
-      "sudo chmod 600 .ssh/vm_rsa",
-      "ssh-keygen -F github.com || ssh-keyscan github.com >> ${var.target_path_root}/.ssh/known_hosts",
-      "ssh-agent bash -c 'ssh-add ${var.target_path_root}/.ssh/vm_rsa; cd ${var.target_path_root}/workspace/projects; git clone git@github.com:winsonsun/keyin.git'",
-      #"ssh-agent bash -c 'ssh-add ~/.ssh/vm_rsa; git push origin master'",
-      "cd ${var.target_path_root}/workspace/projects/keyin; git checkout master; sudo ${var.target_path_root}/workspace/projects/keyin/common/init-vm.sh N US ubuntu; cd ~",
-      "sudo rsync -vr ${var.target_path_root}/workspace/projects/keyin/conf /etc/keyin/",
-      "sudo rsync -vr ${var.target_path_root}/workspace/projects/keyin/composeit /etc/keyin/",
-      "sudo rsync -vr /etc/keyin/conf/etc-other/limits.conf /etc/security/",
-      "sudo rsync -vr /etc/keyin/conf/etc-other/sysctl.conf /etc/sysctl.conf; sudo sysctl -p",
-      "sleep 5",
-      "sudo usermod -aG docker ${var.target_user_name}",
-      "cat ~/docker_passwd.txt | sudo docker login --username winsonsun --password-stdin ; sudo docker pull winsonsun/sstool:0.2; sudo docker pull winsonsun/kktool:0.2",
-      "sudo ${var.target_path_root}/workspace/projects/keyin/common/change-local-ip.sh /etc/keyin/conf/network/kcp-server.json",
-      "sudo cp ${var.target_path_root}/workspace/projects/keyin/common/docker-compose-sk.service /etc/systemd/system/; sudo systemctl daemon-reload",
-      "sudo systemctl enable docker-compose-sk.service; sudo systemctl start docker-compose-sk.service"
+      "sudo chmod +x ${var.target_path_root}/docker-github-login.sh",
+      "${var.target_path_root}/docker-github-login.sh ${var.target_path_root} ${var.target_user_name}",
     ]
   }
 }
@@ -157,11 +147,12 @@ resource "aws_lightsail_instance_public_ports" "app" {
   #  to_port = 18613
   #}
   
-  #port_info {
-  #  protocol = "tcp"
-  #  from_port = 18513
-  #  to_port = 18613
-  #}
+  port_info {
+    protocol = "tcp"
+    from_port = 18600
+    to_port = 18600
+    #description = "testing purpose only, no permanent service is running on"
+  }
 }
 
 output "instance_lan_addr" {
@@ -170,6 +161,10 @@ output "instance_lan_addr" {
 
 output "instance_wan_addr" {
   value = aws_lightsail_instance.app.public_ip_address
+  
+  depends_on = [
+    aws_lightsail_static_ip.static_ip_110
+  ]
 }
 
 output "instance_static_ip" {
