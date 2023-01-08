@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts h:u:k:y:p:r:d: flag
+while getopts s:n: flag
 do
     case "${flag}" in
         s) static_ip_name=${OPTARG};;

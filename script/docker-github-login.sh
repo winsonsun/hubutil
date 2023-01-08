@@ -14,7 +14,7 @@ sudo chmod 600 .ssh/vm_rsa
 ssh-keygen -F github.com || ssh-keyscan github.com >> ${working_root}/.ssh/known_hosts
 ssh-agent bash -c "ssh-add ${working_root}/.ssh/vm_rsa; cd ${working_root}/workspace/projects; git clone git@github.com:winsonsun/keyin.git"
 #"ssh-agent bash -c 'ssh-add ~/.ssh/vm_rsa; git push origin master'
-cd ${working_root}/workspace/projects/keyin; git checkout master; sudo ${working_root}/workspace/projects/keyin/common/init-vm.sh N US ubuntu; cd ~
+cd ${working_root}/workspace/projects/keyin; git checkout master; sudo ${working_root}/workspace/projects/keyin/common/init-vm.sh -s Y -d N -r US -u ubuntu; cd ~
 sudo rsync -vr ${working_root}/workspace/projects/keyin/conf /etc/keyin/
 sudo rsync -vr ${working_root}/workspace/projects/keyin/composeit /etc/keyin/
 sudo rsync -vr /etc/keyin/conf/etc-other/limits.conf /etc/security/
